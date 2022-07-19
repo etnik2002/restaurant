@@ -9,11 +9,3 @@ function order(){
 
 
 
-function readAndWrite(cart){
-    cart.forEach(x =>{
-        if(cart.length > 0){
-            fs.writeFile('menu2.json', "efasefaewf");
-        }
-
-    })
-}
