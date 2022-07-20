@@ -50,10 +50,9 @@ function shfaqProduktet(data) {
     productsListDiv ? productsListDiv.innerHTML = "" : null;
     productsDiv ? productsDiv.innerHTML = "" : null;
     data.forEach((d) => {
-       
         for(let i=0; i<d.products.length; i++) {
             let productNote = d.products[i].notes;
-            let productTest = JSON.stringify(d.products[i]);
+            let product = JSON.stringify(d.products[i]);
 
             if( productNote == null ){
                 productNote = "No description Available";
@@ -72,7 +71,7 @@ function shfaqProduktet(data) {
                                 <p id="">Price without Vat: <span class="priceNoVat"> ${d.products[i].sellingPriceNoVat} den </span> </p>
                                 <p id="">Quantity available: <span id="productQt" style="color: blue;"> ${d.products[i].qt} </span> </p>
                                 <p id="">Category: <span id="categoryDescr" style="color: black;"> ${d.name} </span> </p>
-                                <button class="addToCartBtn" id="${i}" onclick='getProduct(${productTest})' > Add to cart </button>        
+                                <button class="addToCartBtn" id="${d.products[i].productId}" onclick='getProduct(${product})' > Add to cart </button>        
                             </div>
                         </div>
                     </div>
@@ -86,30 +85,28 @@ function shfaqProduktet(data) {
 
 let cart = [];
 
-function getProduct(clickProduct, id) {
-    
-    cart =  localStorage.getItem('CART') ? JSON.parse(localStorage.getItem('CART')) : [];
-    cart.push({...clickProduct, numberOfQt: 1});
-    document.location.reload();
+
+
+function getProduct(product, id) {
+    console.log({product, id})
+    cart = localStorage.getItem('CART') ? JSON.parse(localStorage.getItem('CART')) : [];
+
+    let isInCart = cart.some((x) => x.productId === product.productId);
+
+    console.log( isInCart );
+
+    if( isInCart ){
+        alert("This product is already in cart");
+    }
+    else
+    {
+        cart.push( product );
+        document.location.reload();
+    }    
+   
     localStorage.setItem('CART', JSON.stringify(cart));
     shfaqNeCart();
 
-}
-
-function addToCart() {
-    addQt(clickProduct);
-}
-
-
-
-
-function addQt(product, id){
-    const index = cart.findIndex(x => x.productId === product.id);
-    if (index > -1) {
-        cart[index].numberOfQt +=1; 
-    } else {
-        cart.push({...product, numberOfQt: 1});
-    }
 }
 
 
@@ -139,7 +136,6 @@ function addQt(product, id){
                     <button class="btn btn-danger" type="button" onclick="removeFromCart(${item.productId})"> REMOVE </button>
             </div>
             </div>
-
         `;
 
         document.getElementById("totalProductsElement").innerHTML = `<strong class="cart-total-title"> Total Products: </strong> <span class="cart-total-title"> ${numberOfProducts} </span>`;
@@ -149,8 +145,6 @@ function addQt(product, id){
     cartTotal();
 }
 
-
-   
 
 
 function cartTotal(){
@@ -169,11 +163,12 @@ function cartTotal(){
         let quantity = quantityElement.value;
         total += ( price * quantity );
         
+       
 
         let priceNoVatElement = document.getElementById("cartPriceNoVat");
         let priceNoVat = parseFloat(priceNoVatElement.innerText.replace('$', ''));
         totalNoVat += (priceNoVat * quantity);
-        
+
     }
     document.getElementsByClassName("cart-total-price")[0].innerText = `${total.toFixed(2)} den `;
     document.getElementById("cart-total-price-noVat").innerHTML = `${totalNoVat.toFixed(2)} den `;
@@ -183,14 +178,16 @@ function cartTotal(){
 function removeFromCart(id){
     console.log(id);
     console.log(cart);
-    
-    cart = cart.filter((x)=> x.productId != id)
-    localStorage.setItem('CART', JSON.stringify(cart))
+
+    cart = cart.filter((x)=> x.productId !== id);
+    localStorage.setItem('CART', JSON.stringify(cart));
     console.log(cart);
-    shfaqNeCart()
+    shfaqNeCart();
     cartTotal();
     
 }
+
+
 
 window.onload = () => {
     cart = localStorage.getItem('CART') ? JSON.parse(localStorage.getItem('CART')) : [];
@@ -205,7 +202,7 @@ window.onload = () => {
         input.addEventListener('change', function(e) {
                 
                 let inputVal = e.target;
-                console.log({inputVal})
+
                 if( isNaN(inputVal.value) || inputVal.value <= 0 ) {
                     inputVal.value = 1;
                 }
@@ -221,6 +218,3 @@ window.onload = () => {
 
     cartTotal();
 }
-
-// export { shfaqNeCart, shfaqProduktet, getProducts };
-
