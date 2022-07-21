@@ -8,7 +8,6 @@
 // Storage) with the total amount
 
 
-// const fs = require('fs');
 
 
 let cartItemTitle = document.getElementById("cart-item-title");
@@ -69,7 +68,6 @@ function shfaqProduktet(data) {
                                 </br>
                                 <p id="">Price with Vat: <span class="priceVat"> ${d.products[i].sellingPriceWithVat} den </span> </p>
                                 <p id="">Price without Vat: <span class="priceNoVat"> ${d.products[i].sellingPriceNoVat} den </span> </p>
-                                <p id="">Quantity available: <span id="productQt" style="color: blue;"> ${d.products[i].qt} </span> </p>
                                 <p id="">Category: <span id="categoryDescr" style="color: black;"> ${d.name} </span> </p>
                                 <button class="addToCartBtn" id="${d.products[i].productId}" onclick='getProduct(${product})' > Add to cart </button>        
                             </div>
@@ -80,6 +78,7 @@ function shfaqProduktet(data) {
         }
     });
 }
+
 
 
 
@@ -101,9 +100,10 @@ function getProduct(product, id) {
     else
     {
         cart.push( product );
-        document.location.reload();
+        numberOfCartProducts ? numberOfCartProducts.innerHTML = `${cart.length}` : null;
+        // document.location.reload();
     }    
-   
+    
     localStorage.setItem('CART', JSON.stringify(cart));
     shfaqNeCart();
 
@@ -130,7 +130,7 @@ function getProduct(product, id) {
                     <span class="cart-item-title"> ${item.name} </span>
                 </div>
                 <span class="cart-price cart-column"> ${item.sellingPriceWithVat} den </span>
-                <span style="display: none;" class="cart-price cart-column" id="cartPriceNoVat"> ${item.sellingPriceNoVat} den (No Vat)</span>
+                <span style="display: none;" class="cart-price-nv cart-column" id="cartPriceNoVat"> ${item.sellingPriceNoVat} den (No Vat)</span>
                 <div class="cart-quantity cart-column">
                     <input class="cart-quantity-input" type="number" value="1" >
                     <button class="btn btn-danger" type="button" onclick="removeFromCart(${item.productId})"> REMOVE </button>
@@ -154,7 +154,7 @@ function cartTotal(){
     let cartRows = cartItems.getElementsByClassName('cart-row');
     let total = 0;
     let totalNoVat = 0;
-  
+    
     for ( let i = 0; i < cartRows.length; i++ ) {
         let cartRow = cartRows[i];
         let priceElement = cartRow.getElementsByClassName('cart-price')[0];
@@ -164,10 +164,10 @@ function cartTotal(){
         total += ( price * quantity );
         
        
-
-        let priceNoVatElement = document.getElementById("cartPriceNoVat");
+        let priceNoVatElement = cartRow.getElementsByClassName("cart-price-nv")[0];
         let priceNoVat = parseFloat(priceNoVatElement.innerText.replace('$', ''));
-        totalNoVat += (priceNoVat * quantity);
+        totalNoVat += ( priceNoVat * quantity );
+        
 
     }
     document.getElementsByClassName("cart-total-price")[0].innerText = `${total.toFixed(2)} den `;
